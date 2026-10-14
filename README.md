@@ -156,9 +156,9 @@ Characterization tests are written from the top-priority rule cards, then a port
 
 ## License
 
-This repository is **not open source**. It is licensed under the [Athanor Workshop License 1.0](LICENSE), which lets you use it only while taking part in an Athanor workshop run by CODE Éxitos:
+This repository is **not open source**. It is licensed under the [Athanor Workshop License 1.0](LICENSE), which lets you use it only from your invitation to an Athanor workshop run by CODE Éxitos until that session ends:
 
-- **You may** copy it into one private repository of your own, open it in a Codespace or clone it, read it, run it, change it and analyze it with AI coding assistants during the session.
+- **You may** copy it into one private repository of your own, open it in a Codespace or clone it, read it, run it, change it and analyze it with AI coding assistants to prepare for and take part in the session.
 - **You may not** publish or share it or any changed version, keep a public fork, use it commercially or to teach other courses, or use it to train AI models.
 - **When the session ends**, delete your copies, including your repository copy and your Codespace. Your own notes are fine.
 

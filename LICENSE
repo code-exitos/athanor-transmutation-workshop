@@ -13,15 +13,16 @@ this repository (the "Materials"). It is not an open-source license.
 
 2. What you may do
 
-   During the Session you attend, you may:
+   From the time you are invited to a Session until that Session ends, you
+   may:
 
    a. view, download and clone the Materials, and copy them into one private
       repository of your own (for example with GitHub's "Use this template");
    b. build, run, analyze and change them on your own device or in a cloud
       development environment you control, such as GitHub Codespaces; and
-   c. process them with AI coding assistants and analysis tools to complete
-      the Session's exercises, provided those tools are not configured to use
-      your inputs to train or improve AI models.
+   c. process them with AI coding assistants and analysis tools to prepare
+      for and complete the Session's exercises, provided those tools are not
+      configured to use your inputs to train or improve AI models.
 
 3. What you may not do
 
