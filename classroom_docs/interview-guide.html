@@ -1,0 +1,552 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FLT Developer Interview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap">
+<style>
+/* Layout: a flight-test interview card deck. Narrow reading column, sticky filter strip, one card per question, decision tags like logbook stamps. */
+:root{
+  --bg:#f5f6f4; --surface:#ffffff; --fg:#1d2427; --muted:#5b6669; --line:#d9dedc;
+  --accent:#1f5d73; --drop:#a2482c; --keep:#2d6b4f; --fix:#9a6a00; --block:#b3261e;
+  --tag-bg:#eef1f0;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121618; --surface:#1a2023; --fg:#e4e9e8; --muted:#9aa6a8; --line:#2d3639;
+  --accent:#6fb3cc; --drop:#e48a6c; --keep:#74c39c; --fix:#e0b54a; --block:#ff8a80; --tag-bg:#232b2e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121618; --surface:#1a2023; --fg:#e4e9e8; --muted:#9aa6a8; --line:#2d3639;
+  --accent:#6fb3cc; --drop:#e48a6c; --keep:#74c39c; --fix:#e0b54a; --block:#ff8a80; --tag-bg:#232b2e; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:780px;margin:0 auto;padding-block:40px 80px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:2.1rem;font-weight:600;line-height:1.15}
+h2{font-size:1.35rem;font-weight:600}
+h3{font-size:1.08rem;font-weight:600;line-height:1.35}
+.eyebrow{font:500 .75rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+header{display:grid;gap:12px;margin-bottom:28px}
+header p{margin:0;color:var(--muted);max-width:65ch}
+code{font-family:var(--mono);font-size:.86em;background:var(--tag-bg);padding:1px 5px;border-radius:3px;overflow-wrap:anywhere}
+.summary{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin:8px 0 4px}
+.summary th,.summary td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+.summary th{font:500 .75rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.summary td.n{text-align:right;width:5.5rem}
+.summary tr.total td{font-weight:600;border-bottom:none}
+.tablebox{overflow-x:auto}
+.how{display:grid;gap:6px;margin:20px 0 0;padding:0;list-style:none;color:var(--muted)}
+.how li{padding-left:16px;position:relative}
+.how li::before{content:"";position:absolute;left:0;top:.7em;width:6px;height:1px;background:var(--muted)}
+.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--bg);
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);margin:28px 0 8px}
+.filters span{font:500 .75rem var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-right:4px}
+.chip{font:500 .85rem var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);
+  padding:5px 12px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{margin-left:auto;font:400 .82rem var(--mono);color:var(--muted)}
+section.part{margin-top:36px;display:grid;gap:14px}
+section.part > p{margin:0;color:var(--muted);max-width:65ch}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px 20px;display:grid;gap:10px;min-width:0}
+.q.blocking{border-left:3px solid var(--block)}
+.qhead{display:flex;gap:12px;align-items:baseline}
+.qid{font:500 .85rem var(--mono);color:var(--muted);flex:none;width:2.4rem}
+.tags{display:flex;flex-wrap:wrap;gap:6px;padding-left:calc(2.4rem + 12px)}
+.tag{font:500 .7rem/1 var(--mono);letter-spacing:.07em;text-transform:uppercase;padding:5px 7px;border-radius:3px;
+  border:1px solid currentColor;background:transparent}
+.tag.block{color:var(--block)} .tag.drop{color:var(--drop)} .tag.keep{color:var(--keep)} .tag.fix{color:var(--fix)} .tag.cond{color:var(--muted)}
+.body{padding-left:calc(2.4rem + 12px);display:grid;gap:8px;min-width:0}
+.body p{margin:0}
+.body ul{margin:0;padding-left:18px;display:grid;gap:3px}
+.lbl{font-weight:600}
+.src{font-size:.85rem;color:var(--muted)}
+.note{font-size:.9rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
+.left-out{margin-top:44px;display:grid;gap:12px}
+.left-out ul{margin:0;padding-left:18px;display:grid;gap:8px;max-width:68ch}
+footer{margin-top:40px;color:var(--muted);font-size:.85rem}
+@media (max-width:520px){
+  h1{font-size:1.7rem}
+  .tags,.body{padding-left:0}
+  .qid{width:auto}
+  .count{margin-left:0;width:100%}
+}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Contoso Flight Log Tracking · Step 04 Capture</div>
+  <h1>Interview guide for the departing developer</h1>
+  <p>35 questions for the developer who knows FLT best, built from the x-ray's questions and contested items, the rule cards' SME questions and the suspected defects. A question stays only if its answer changes what we <strong>drop</strong>, <strong>keep</strong> or <strong>fix</strong>.</p>
+  <div class="tablebox">
+  <table class="summary">
+    <thead><tr><th>Part</th><th>Theme</th><th class="n">Questions</th><th class="n">Blocking</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>What still runs</td><td class="n">10</td><td class="n">10</td></tr>
+      <tr><td>2</td><td>Production settings that switch rules on or off</td><td class="n">6</td><td class="n">6</td></tr>
+      <tr><td>3</td><td>Rules to confirm before they become tests</td><td class="n">10</td><td class="n">10</td></tr>
+      <tr><td>4</td><td>Suspected defects: keep the behaviour or fix it</td><td class="n">9</td><td class="n">5</td></tr>
+      <tr class="total"><td></td><td>Total</td><td class="n">35</td><td class="n">31</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="how">
+    <li>Plan two sessions of about 60 minutes. Ask Part 1 first: its answers decide which code exists at all.</li>
+    <li><strong>Blocking</strong> means we can't drop the code or write the rule's test until we have the answer.</li>
+    <li>Ask for evidence: a server name, a config file, a scheduled task or a person. "I think so" goes down as unconfirmed.</li>
+    <li>Record each answer in <code>context/brownfield/interview-guide.md</code>, then update the drop list or the rule card it cites.</li>
+  </ul>
+</header>
+
+<div class="filters" role="toolbar" aria-label="Filter questions">
+  <span>Show</span>
+  <button class="chip" id="f-all" data-f="all" aria-pressed="true">All</button>
+  <button class="chip" id="f-block" data-f="block" aria-pressed="false">Blocking</button>
+  <button class="chip" id="f-drop" data-f="drop" aria-pressed="false">Drop</button>
+  <button class="chip" id="f-keep" data-f="keep" aria-pressed="false">Keep</button>
+  <button class="chip" id="f-fix" data-f="fix" aria-pressed="false">Fix</button>
+  <div class="count" id="count" aria-live="polite">35 of 35 questions</div>
+</div>
+
+<section class="part" id="part1">
+  <div class="eyebrow">Part 1</div>
+  <h2>What still runs</h2>
+  <p>These answers decide which code exists at all. Several questions in later parts drop out depending on them.</p>
+
+  <article class="q blocking" data-t="block drop">
+    <div class="qhead"><span class="qid">Q1</span><h3>Is FLTRestService still hosted anywhere?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag drop">Drop</span></div>
+    <div class="body">
+      <p>The client says the WCF REST service is retired. Its <code>Application_Start</code> still registers a public route, though, including a POST that writes flights through <code>FlightManager.Insert</code>. Its Web.config points at <code>dbserver05\sql2k5</code>.</p>
+      <p><span class="lbl">Ask:</span> Is any IIS site, app pool or binding still serving <code>/FLT/...</code>? Has any device or integration posted flights there since FLTWebAPI went live?</p>
+      <p><span class="lbl">Decides:</span> nothing serves it, so drop the whole project together with FLTRestClient. If it does, it's a live write path and its flight mapping must be ported.</p>
+      <p class="src"><code>FLTRestService/Global.asax.cs:20</code> · <code>FLTRestService/FLTService.cs:436</code> · 6 contested items in the brief</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block drop">
+    <div class="qhead"><span class="qid">Q2</span><h3>How is FLTWebApp deployed to production?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag drop">Drop</span></div>
+    <div class="body">
+      <p>Several pages are in the folder but not in the active <code>FLTWebApp.vbproj</code>: the root-level <code>AircraftReportsMenu.aspx</code> and <code>DailyUsageParameters.aspx</code>, and the Crystal report pages.</p>
+      <p><span class="lbl">Ask:</span> Is production built from a Web Deploy or publish package that follows the project file, or copied as a folder?</p>
+      <p><span class="lbl">Decides:</span> a publish package means anything outside the vbproj never reached production, so drop it. A folder copy means those pages are live and go back to "contested".</p>
+      <p class="src">Reachability brief, contested items 9 and 10</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block drop keep">
+    <div class="qhead"><span class="qid">Q3</span><h3>Are the Crystal reports still used, and where are the <code>.rpt</code> files?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag drop">Drop</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>The report pages (<code>aircraftReports/*</code>, <code>statisticalReports/*</code>, <code>reportObjects/*</code>, <code>DownloadData.aspx</code>) appear only in the backup project file, and no <code>.rpt</code> file is in the repo. They and the nine tab-delimited exports are the only callers of the <code>rpt*</code> procedures.</p>
+      <p><span class="lbl">Ask:</span> Who runs these reports today? Was the backup vbproj the one last used to build production? Which Crystal runtime do they need?</p>
+      <p><span class="lbl">Decides:</span> unused, so drop the pages, exports and <code>rpt*</code> procedures, along with Q30–Q32. Used, so the fuel-burn, outlier and completion rules join the contract (RULE-026 to RULE-030, RULE-101).</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block drop">
+    <div class="qhead"><span class="qid">Q4</span><h3>Does anyone use <code>FlightModify_alt2.aspx</code>?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag drop">Drop</span></div>
+    <div class="body">
+      <p>No page links to it, but it ships with every deploy and saves flights through the same business objects. It differs from <code>FlightModify.aspx</code>: different controls, no <code>Exit Sub</code> after the login redirect, and no engine-run grid.</p>
+      <p><span class="lbl">Decides:</span> unused, so drop it. Bookmarked and used, so find out which of its differences users rely on.</p>
+      <p class="src"><code>FLTWebApp/fleet/FlightModify_alt2.aspx.vb:24</code></p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block drop keep">
+    <div class="qhead"><span class="qid">Q5</span><h3>Is <code>GetExportFile.aspx</code> how browser users download exports?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag drop">Drop</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>The graph marks it dormant, but <code>exportFlt.aspx</code> builds links to it, and the interactive export may hand off to it for the download step. It serves any file in <code>~/download</code> by name.</p>
+      <p><span class="lbl">Decides:</span> if it's the download path, keep it and fix the by-name file serving in step 05. If not, drop it together with <code>exportFlt.aspx</code>.</p>
+      <p class="src"><code>FLTWebApp/export/exportFlt.aspx.vb:105</code> · <code>FLTWebApp/export/GetExportFile.aspx.vb:37</code></p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q6</span><h3>Who consumes the <code>Download_*.xml</code> export files?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>Every export flow ends when a file lands on disk: the console job's <code>DownloadPath</code>, the web app's <code>~/download</code>, or an operator's My Documents. Nothing in the repo reads those files.</p>
+      <p><span class="lbl">Ask:</span> Which system or person reads them, and what does it do with them? Is the console's <code>DownloadPath</code> the folder the web app serves from? The console config has no <code>appPrefix</code>, so its file names start with an empty prefix.</p>
+      <p><span class="lbl">Decides:</span> whether the XML layout and file names are an external contract to keep byte-for-byte, or whether the export can be redesigned or dropped.</p>
+      <p class="src"><code>FLTExportConsoleApp/FLTExportConsoleApp/App.config:6-15</code> · RULE-212</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q7</span><h3>How is the export console job triggered, and with what settings?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>The repo contains no scheduler. The job needs the <code>FLT.Export.Auth</code> Credential Manager entry for its run-as account. An invalid <code>NbrOfDaysHistory</code> silently gives a 0-day window, and the run still exits 0.</p>
+      <p><span class="lbl">Ask:</span> Which server, Task Scheduler task, schedule and account run it? What is <code>NbrOfDaysHistory</code> in production? Does anyone notice when a run produces nothing?</p>
+      <p><span class="lbl">Decides:</span> what the replacement scheduler must reproduce (RULE-005, RULE-143), and whether "exit 0 on failure" is relied on or is a bug to fix.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block drop keep">
+    <div class="qhead"><span class="qid">Q8</span><h3>Is <code>setMeters</code> run by hand when a Hobbs meter is replaced?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag drop">Drop</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>No code calls it, but it changes aircraft meter offsets, which feed the core calculation: airframe hours = Hobbs + offset (RULE-002, RULE-006).</p>
+      <p><span class="lbl">Ask:</span> Who runs it, when, and with what inputs? Is the in-app configuration chaining (RULE-001) the normal path, or is this procedure?</p>
+      <p><span class="lbl">Decides:</span> if it's run by hand, it's an undocumented business process the rewrite must turn into a screen. If not, drop it.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q9</span><h3>Is <code>database/FLT_Schema.sql</code> what production runs?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>Rules were mined from the schema script and from three change scripts that were never folded in. Two of those scripts disagree with the schema:</p>
+      <ul>
+        <li><code>DuplicateFlightKeyModification.sql</code> rewrites <code>addFlight</code> and adds the aircraft-hours roll-up (RULE-008).</li>
+        <li><code>alter_procedure_listAircraftInfos.sql</code> changes how aircraft usage is summed (RULE-024).</li>
+      </ul>
+      <p><span class="lbl">Ask:</span> Which version of <code>addFlight</code>, <code>updateFlight</code> and <code>listAircraftInfos</code> is in production? Are there triggers or computed columns that aren't in the script?</p>
+      <p><span class="lbl">Decides:</span> which SQL rule cards describe live behaviour. Until then, every SQL-sourced P0 card stays unconfirmed.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q10</span><h3>Where is the source for ContosoUtilities?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>Every project references the Logger in <code>ContosoUtilities</code>, which is outside this repo. Two copies are referenced from two different paths (<code>..\..\Common\</code> and <code>..\..\..\VS2017_Common\</code>).</p>
+      <p><span class="lbl">Decides:</span> whether the logging behaviour can be read and kept, or must be treated as a black box. Without it nothing builds, which blocks step 06's characterization tests.</p>
+    </div>
+  </article>
+</section>
+
+<section class="part" id="part2">
+  <div class="eyebrow">Part 2</div>
+  <h2>Production settings that switch rules on or off</h2>
+  <p>The repo's configs aren't production's. These settings decide which rules are live.</p>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q11</span><h3>Which business-rule switches are set to <code>N</code> in production?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>Every flight and work-order validation rule can be turned off by an appSettings key named after its rule ID. <code>BusinessRuleEnabled</code> (<code>AppConfig.vb:22</code>) treats a rule as on unless its key is present and set to <code>N</code>. No config in the repo sets any of them.</p>
+      <p><span class="lbl">Ask:</span> Show us the production appSettings for FLTWebApp, FLTWebAPI and FLTExportConsoleApp. Which overridable warnings do users override routinely?</p>
+      <p><span class="lbl">Decides:</span> which validation rules stay hard rules, which stay warnings, and which go. The key one is <code>02-00-01B</code>: region time must add up to Hobbs time (RULE-004).</p>
+      <p class="note">The RULE-004 card says the switch's definition wasn't found. It's at <code>AppConfig.vb:22</code>; correct the card.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q12</span><h3>What are the production login-lockout settings?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>The code falls back to 3 failures and 5 minutes (<code>AppConfig.vb:32-58</code>). FLTWebApp's Web.config sets 5 failures and 10 minutes (<code>Web.config:79-80</code>). FltFleet and FLTWebAPI set neither, so they use the fallback. The failure count is never reset by time, despite the field name <code>FailedPasswordAttemptWindowStart</code>.</p>
+      <p><span class="lbl">Decides:</span> the values for RULE-175 and RULE-178, and whether one lockout policy should cover all three sites.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q13</span><h3>Which login path checks the password in production?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <ul>
+        <li><code>fltPassword</code> hashes passwords with a per-user salt and SHA-512 (RULE-003).</li>
+        <li>The <code>fltValidateLogin</code> procedure compares the password as plain text, ignoring case (RULE-045, <code>FLT_Schema.sql:6743-6753</code>).</li>
+      </ul>
+      <p>Both can't describe the same stored column.</p>
+      <p><span class="lbl">Ask:</span> Are stored passwords hashed? Which code path does a login actually take?</p>
+      <p><span class="lbl">Decides:</span> whether the rewrite must verify existing hashes or can force a reset of every password. It also tells us whether passwords are stored in plain text today, which goes to step 05.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q14</span><h3>What do FltFleet's edit-window settings hold?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>Who may change an aircraft's UP / DOWN / OFF TEST status depends on <code>ChangeTimeStart/Stop Hour/Minute For&lt;RoleId&gt;</code> settings, compared against a "Pacific time" derived from the server's own time zone (RULE-043, RULE-023).</p>
+      <p><span class="lbl">Ask:</span> What are the production values, and which role IDs do they map to? Is the window meant to be Pacific time wherever the aircraft is based?</p>
+      <p><span class="lbl">Decides:</span> the parameters for P0 rule RULE-043. The answer also settles Q33.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep fix">
+    <div class="qhead"><span class="qid">Q15</span><h3>Who calls FLTWebAPI, and what are the fallback credentials?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span><span class="tag fix">Fix</span></div>
+    <div class="body">
+      <p>A request with no Authorization header runs as the <code>userName</code>/<code>password</code> account in Web.config (RULE-181).</p>
+      <p><span class="lbl">Ask:</span> Which devices or systems call the API? Do any rely on not sending credentials? What can the fallback account do?</p>
+      <p><span class="lbl">Decides:</span> if nobody relies on it, remove the fallback in step 05. If callers rely on it, plan a migration for them.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q16</span><h3>Which databases are production, and what is <code>FLTReport</code>?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>Connection strings name <code>dbserver05\sql2k5</code>, <code>dbserver02</code>, the <code>FLT</code> connection, a separate <code>FLTReport</code> connection, and a Crystal logon.</p>
+      <p><span class="lbl">Decides:</span> whether report rules read the same data as the screens. If <code>FLTReport</code> is a lagging copy, report figures will legitimately differ from screen figures, and the tests must allow for it.</p>
+    </div>
+  </article>
+</section>
+
+<section class="part" id="part3">
+  <div class="eyebrow">Part 3</div>
+  <h2>Rules to confirm before they become tests</h2>
+  <p>P0 or contract-shaping rules that the mining panel rated below High confidence, or that conflict with another rule. Each answer becomes a characterization test in step 06.</p>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q17</span><h3>Airframe hours: does the offset get added or subtracted?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <ul>
+        <li>Saving a flight sets airframe hours = Hobbs + offset (RULE-002, RULE-006).</li>
+        <li>The Web API's fleet endpoint reports <code>AirframeHoursCurrent</code> minus the offset (RULE-019, <code>FleetController.cs:96-97</code>).</li>
+      </ul>
+      <p><span class="lbl">Ask:</span> Is <code>Aircraft.AirframeHoursCurrent</code> stored as true airframe hours or as the meter reading? Do API clients use it to pre-fill Hobbs start?</p>
+      <p><span class="lbl">Also confirm:</span> the code rounds each input to 0.1 before adding, so 1234.45 + 0.05 = 1234.6. Is 0.1 hour the official precision (RULE-016)?</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q18</span><h3>Should aircraft hours roll up from approved flights only?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>The roll-up runs when an approved flight is added, but its aggregate counts all active flights, so an unapproved flight with a higher reading can raise an aircraft's official hours (RULE-008, <code>DuplicateFlightKeyModification.sql:180-195</code>). Aircraft usage in <code>listAircraftInfos</code> doesn't filter on approval either (RULE-024).</p>
+      <p><span class="lbl">Decides:</span> the rule for the most-watched figure in the campaign: progress toward required hours.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q19</span><h3>What does "approved" mean, and who approves?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <ul>
+        <li>A validated save auto-approves the flight as the saving user (RULE-114).</li>
+        <li>The Web API inserts flights unapproved (RULE-117).</li>
+        <li>The <code>updateFlight</code> procedure re-stamps the approver on edits (RULE-119).</li>
+        <li>Unapproved flights are hidden from the aircraft view (RULE-136).</li>
+      </ul>
+      <p><span class="lbl">Ask:</span> Who approves API-uploaded flights, and on which screen? Can approval be reversed? Must the original approver and date survive later edits?</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep drop">
+    <div class="qhead"><span class="qid">Q20</span><h3>Are duplicate flights blocked today, or only reported?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span><span class="tag drop">Drop</span></div>
+    <div class="body">
+      <p><code>addFlight</code> raises "Duplicate Flight Entry" for the same aircraft, location, date and shift, but nothing stops the procedure afterwards, so the INSERT runs unless the caller rolls back (RULE-044, <code>FLT_Schema.sql:3847-3855</code>). The backfill <code>zFix_Set_Flight_DuplicateCount</code> can't run as written: line 72 fetches from the wrong cursor.</p>
+      <p><span class="lbl">Ask:</span> Does production contain duplicate flights? Was <code>DuplicateCount</code> ever added and backfilled? Should soft-deleted flights count as duplicates?</p>
+      <p><span class="lbl">Decides:</span> whether the rewrite hard-blocks duplicates and whether existing data needs cleaning before migration. If the backfill never ran, drop <code>zFix_*</code>.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q21</span><h3>Overnight and late flights: are the cut-offs intended?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <ul>
+        <li>A return moves to the next day only when its hour is earlier than the departure hour (RULE-010).</li>
+        <li>Comments and engine runs move to the next day only when departure is at or after 16:00 (RULE-011).</li>
+      </ul>
+      <p><span class="lbl">Ask:</span> Is 16:00 a deliberate "night flight" rule? Do flights ever cross midnight with a departure before 16:00?</p>
+      <p><span class="lbl">Decides:</span> the date-time rules every flight passes through. See also Q27.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q22</span><h3>Is <code>ConcurrencyId</code> a SQL <code>rowversion</code>?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>Optimistic concurrency (RULE-036) works only if the column changes automatically on every write. The DAL also packs it into an Int64 that overflows at high values (RULE-018).</p>
+      <p><span class="lbl">Decides:</span> whether the rewrite can use the database's native concurrency token or must copy the existing encoding.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q23</span><h3>What are the work-order statuses and allowed transitions?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>Neither the business object nor the stored procedures enforce any transition (RULE-133, RULE-137, RULE-166). Saving an open work order without an end meter overwrites a recorded end meter with 0.</p>
+      <p><span class="lbl">Ask:</span> Must a work order have a finish date, end meter or mechanic before it can be closed? Is that enforced by people, by the UI, or not at all?</p>
+      <p><span class="lbl">Decides:</span> whether the rewrite adds a lifecycle or keeps "any status, any time".</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q24</span><h3>What are the aircraft statuses, and must an aircraft reach its required hours before it finishes testing?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p><code>TotalRequiredUsage</code>, <code>AccumUsage</code> and the end-of-test dates are stored, but no transition is enforced (RULE-134, RULE-164).</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep">
+    <div class="qhead"><span class="qid">Q25</span><h3>Must a work order and its children save all-or-nothing?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span></div>
+    <div class="body">
+      <p>RULE-116 says the work order and its child records save in one transaction, but some writes run outside it:</p>
+      <ul>
+        <li>document metadata updates (<code>WorkOrderDB.vb:600</code>)</li>
+        <li>performed-work adds from the grid (RULE-152)</li>
+        <li>the business-layer insert path, which has no shared transaction (RULE-128)</li>
+      </ul>
+      <p><span class="lbl">Decides:</span> whether the test asserts full rollback, as the code's structure intends, or the partial saves that happen today.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep fix">
+    <div class="qhead"><span class="qid">Q26</span><h3>Are the liquid-fill limits right?</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span><span class="tag fix">Fix</span></div>
+    <div class="body">
+      <div class="tablebox">
+      <table class="summary">
+        <thead><tr><th>Fluid</th><th class="n">gal</th><th class="n">L</th><th class="n">qt</th></tr></thead>
+        <tbody>
+          <tr><td>Jet-A</td><td class="n">150</td><td class="n">600</td><td class="n">600</td></tr>
+          <tr><td>Coolant</td><td class="n">5</td><td class="n">20</td><td class="n">20</td></tr>
+          <tr><td>Hydraulic</td><td class="n">7</td><td class="n">30</td><td class="n">30</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>600 qt equals 150 gal, but the coolant and hydraulic quart limits are about 4× their gallon limits (RULE-057).</p>
+      <p><span class="lbl">Decides:</span> whether the quart limits are a typo to fix or a deliberate rule to keep, and whether limits should be set per aircraft model.</p>
+    </div>
+  </article>
+</section>
+
+<section class="part" id="part4">
+  <div class="eyebrow">Part 4</div>
+  <h2>Suspected defects: keep the behaviour or fix it</h2>
+  <p>Each of these has been producing data, or feeding a downstream consumer, for years. Fixing it changes numbers people may already rely on.</p>
+
+  <article class="q blocking" data-t="block fix">
+    <div class="qhead"><span class="qid">Q27</span><h3>Same-hour overnight returns</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag fix">Fix</span></div>
+    <div class="body">
+      <p>A flight that leaves at 23:50 and returns at 23:10 the next day is stored as returning before it left (<code>FlightManager.vb:471</code>). Editing a flight also doesn't recompute its engine-run times, although creating one does (RULE-114).</p>
+      <p><span class="lbl">Ask:</span> Have such flights happened? Has anyone corrected them by hand?</p>
+      <p><span class="lbl">Decides:</span> fix it in the rewrite, and whether migration corrects historical rows.</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block fix">
+    <div class="qhead"><span class="qid">Q28</span><h3>Region-time false mismatches</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag fix">Fix</span></div>
+    <div class="body">
+      <p>Region hours are summed from values rounded to 0.1, then compared exactly with an unrounded Hobbs difference (RULE-004, <code>Flight.vb:1374-1382</code>). That can raise a hard error on a correct flight.</p>
+      <p><span class="lbl">Ask:</span> Is this why <code>02-00-01B</code> might be switched off in production (Q11)?</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block keep fix">
+    <div class="qhead"><span class="qid">Q29</span><h3>Export creates <code>AircraftLocation</code> rows</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag keep">Keep</span><span class="tag fix">Fix</span></div>
+    <div class="body">
+      <p>Running an export inserts missing aircraft-location rows stamped <code>export</code> (RULE-122, RULE-123).</p>
+      <p><span class="lbl">Decides:</span> if it's intended data repair, keep it somewhere explicit. If it works around a flight-entry bug, fix the bug and drop the side effect. Do any reports depend on those rows?</p>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block fix">
+    <div class="qhead"><span class="qid">Q30</span><h3>Program completion % ignores earlier assignments</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag fix">Fix</span><span class="tag cond">If Q3 keeps the reports</span></div>
+    <div class="body">
+      <p>Program-level percent complete counts only hours at currently qualifying locations, so hours from ended assignments are left out (RULE-026). Usage at a location also merges two separate stays at the same base (RULE-025).</p>
+      <p><span class="lbl">Ask:</span> Do program managers report this number upward? Have they noticed it running low?</p>
+    </div>
+  </article>
+
+  <article class="q" data-t="fix">
+    <div class="qhead"><span class="qid">Q31</span><h3>"Fuel Burn" is hours per unit of fuel, not fuel per hour</h3></div>
+    <div class="tags"><span class="tag fix">Fix</span><span class="tag cond">If Q3 keeps the reports</span></div>
+    <div class="body">
+      <p>The report's <code>Usage</code> column is the inverse of what its name suggests (RULE-028). <code>LiquidAmt DECIMAL(6,3)</code> also overflows at 1,000 or more.</p>
+      <p><span class="lbl">Decides:</span> fix the label and formula, or keep them because analysts already convert the figures.</p>
+    </div>
+  </article>
+
+  <article class="q" data-t="fix">
+    <div class="qhead"><span class="qid">Q32</span><h3>Outlier and daily-usage reports include rows they shouldn't</h3></div>
+    <div class="tags"><span class="tag fix">Fix</span><span class="tag cond">If Q3 keeps the reports</span></div>
+    <div class="body">
+      <ul>
+        <li>Outlier statistics include deleted and inactive flights (RULE-030).</li>
+        <li>The daily-usage report's <code>&lt;&gt; NULL</code> comparisons never match, so end-of-test dates always come back empty (RULE-101).</li>
+      </ul>
+    </div>
+  </article>
+
+  <article class="q blocking" data-t="block fix">
+    <div class="qhead"><span class="qid">Q33</span><h3>The fleet board's time-zone code</h3></div>
+    <div class="tags"><span class="tag block">Blocking</span><span class="tag fix">Fix</span></div>
+    <div class="body">
+      <ul>
+        <li><code>AircraftStatusManager.vb:93</code> checks "central" twice, so Central-zone servers get no correction. The second check was almost certainly meant to be "pacific".</li>
+        <li><code>AircraftStatus.vb:110</code> uses UTC−9 for Pacific Daylight Time. PDT is UTC−7.</li>
+      </ul>
+      <p><span class="lbl">Ask:</span> Which time zone are the FltFleet servers in?</p>
+      <p><span class="lbl">Decides:</span> whether the edit windows (Q14) and last-update times have been off by hours in production, and whether users adapted to the wrong times.</p>
+    </div>
+  </article>
+
+  <article class="q" data-t="fix">
+    <div class="qhead"><span class="qid">Q34</span><h3>The time-zone admin page saves the standard offset as the DST offset</h3></div>
+    <div class="tags"><span class="tag fix">Fix</span></div>
+    <div class="body">
+      <p><code>TimeZones.aspx.vb:134</code> pre-fills the DST offset box with <code>TimeZoneOffset</code>. Unless the admin corrects it, every UTC conversion for that zone in daylight-saving time uses the wrong offset (RULE-079, RULE-219).</p>
+      <p><span class="lbl">Ask:</span> Who maintains the DST begin and end dates each year? Can we compare the stored offsets with real zones?</p>
+      <p><span class="lbl">Decides:</span> whether migration must repair <code>UTCTimeZone</code> rows, and the UTC times of the flights derived from them.</p>
+    </div>
+  </article>
+
+  <article class="q" data-t="fix">
+    <div class="qhead"><span class="qid">Q35</span><h3>The OFF TEST page shows the whole fleet</h3></div>
+    <div class="tags"><span class="tag fix">Fix</span></div>
+    <div class="body">
+      <p>The page and its button suggest an OFF TEST-only view, but its query also returns every UP and DOWN aircraft (RULE-226).</p>
+      <p><span class="lbl">Decides:</span> filter it, or rename it "All aircraft" because that's how people use it.</p>
+    </div>
+  </article>
+</section>
+
+<section class="left-out" id="left-out">
+  <div class="eyebrow">Filtered out</div>
+  <h2>Left out of this guide, and why</h2>
+  <ul>
+    <li><strong>Security defects we fix regardless</strong>, such as plaintext passwords sent by email, password reset without verification, missing permission checks, <code>Or</code> instead of <code>OrElse</code> in the login guards, permissive default rights, and credentials in URLs. These go to step 05 (Secure).</li>
+    <li><strong>Plain bugs with no data impact</strong>, such as the Web API read-back assigning fields to themselves (RULE-083), <code>Case "else"</code> (RULE-093), the "Only Deleted" filter value (RULE-096) and an invalid MIME type (RULE-245). Fix them in the rewrite without asking.</li>
+    <li><strong>Questions the code already answers</strong>, such as where daylight-saving time is applied (<code>FlightManager.vb:521-536</code>).</li>
+    <li><strong>Questions about code we're dropping</strong>, such as FLTDownloadTool's external endpoint. The client confirmed the tool is retired.</li>
+    <li><strong>Taste questions</strong>, such as comment rating scales, sort order and error-page wording. The product owner can decide these in the rewrite.</li>
+    <li><strong>Folded into a question above.</strong> Most of the 112 SME questions duplicated a broader one: approval (Q19), statuses (Q23, Q24), soft delete (Q9) and program forecasting fields (Q3, Q16).</li>
+  </ul>
+  <p style="margin:0;color:var(--muted);max-width:65ch">If a Part 1 or Part 2 answer brings more code back into scope, for example if the Crystal reports turn out to be live, run this filter again over the rule cards for that code.</p>
+</section>
+
+<footer>Source: <code>context/brownfield/interview-guide.md</code> on <code>snapshot/04-capture</code>. Draft, not yet asked. All companies, people and data are fictional.</footer>
+</div>
+
+<script>
+(function(){
+  var chips=document.querySelectorAll('.chip');
+  var qs=document.querySelectorAll('.q');
+  var count=document.getElementById('count');
+  function apply(f){
+    var n=0;
+    qs.forEach(function(q){
+      var show=f==='all'||(' '+q.dataset.t+' ').indexOf(' '+f+' ')>-1;
+      q.hidden=!show; if(show)n++;
+    });
+    document.querySelectorAll('section.part').forEach(function(s){
+      s.hidden=!s.querySelector('.q:not([hidden])');
+    });
+    chips.forEach(function(c){c.setAttribute('aria-pressed',c.dataset.f===f?'true':'false')});
+    count.textContent=n+' of '+qs.length+' questions';
+    try{localStorage.setItem('flt-filter',f)}catch(e){}
+  }
+  chips.forEach(function(c){c.addEventListener('click',function(){apply(c.dataset.f)})});
+  var saved='all'; try{saved=localStorage.getItem('flt-filter')||'all'}catch(e){}
+  apply(saved);
+})();
+</script>
