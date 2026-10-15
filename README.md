@@ -122,7 +122,7 @@ Each step is a *story*: a question, a prompt you give Claude, and a result you r
 | 05 Secure | What is dangerous right now? | `security-sweep` | live demo |
 | 06 Prove | How do we migrate with proof? | code-modernization plugin | facilitator demo |
 
-Every output lands in `context/brownfield/`. Reference transcripts for each step (prompts, replies, tool calls and the questions Claude asked) are in `workshop/transcripts/` on each snapshot branch.
+Every output lands in `context/brownfield/`. The pages to read in class are collected in `classroom_docs/`: it starts with the before-you-arrive guide, and each snapshot adds the HTML pages from its step (open them in a browser). Reference transcripts for each step (prompts, replies, tool calls and the questions Claude asked) are in `workshop/transcripts/` on each snapshot branch.
 
 ### 01 · Map
 
